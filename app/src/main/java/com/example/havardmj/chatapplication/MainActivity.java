@@ -16,23 +16,21 @@ import android.widget.TextView;
 import android.text.format.DateFormat;
 
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.*;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseListOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.util.Objects;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private static int SIGN_IN_REQUEST_CODE = 1;
-    private FirebaseListAdapter<ChatMessage> adapter;
-    RelativeLayout activity_main;
-    FloatingActionButton fab;
+    private static final int SIGN_IN_REQUEST_CODE = 1;
+    private RelativeLayout activity_main;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -72,14 +70,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        activity_main = (RelativeLayout)findViewById(R.id.activity_main);
-        fab = (FloatingActionButton)findViewById(R.id.fab);
+        activity_main = findViewById(R.id.activity_main);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText input = (EditText)findViewById(R.id.input);
+                EditText input = findViewById(R.id.input);
                 FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(input.getText().toString(),
-                        FirebaseAuth.getInstance().getCurrentUser().getEmail()));
+                        Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail()));
                 input.setText("");
             }
         });
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         if(FirebaseAuth.getInstance().getCurrentUser() == null) {
             startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(),SIGN_IN_REQUEST_CODE);
         }else {
-            Snackbar.make(activity_main,"Welcome "+FirebaseAuth.getInstance().getCurrentUser().getEmail(),Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity_main,"Welcome "+ Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail(),Snackbar.LENGTH_SHORT).show();
             //load content
             displayChatMessage();
         }
@@ -98,12 +96,11 @@ public class MainActivity extends AppCompatActivity {
     }
     private void displayChatMessage() {
 
-        ListView listOfMessage = (ListView)findViewById(R.id.list_of_message);
+        ListView listOfMessage = findViewById(R.id.list_of_message);
         Query query = FirebaseDatabase.getInstance().getReference();
         FirebaseListOptions<ChatMessage> options = new FirebaseListOptions.Builder<ChatMessage>().setQuery(query, ChatMessage.class).build();
-                
-        adapter = new FirebaseListAdapter<ChatMessage>(options)
-        {
+
+        FirebaseListAdapter<ChatMessage> adapter = new FirebaseListAdapter<ChatMessage>(options) {
             @Override
             protected void populateView(View v, ChatMessage model, int position) {
 
@@ -112,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
                 TextView messageTime;
 
                 messageText = v.findViewById(R.id.message_text);
-                messageUser = (TextView)v.findViewById(R.id.message_user);
-                messageTime = (TextView)v.findViewById(R.id.message_time);
+                messageUser = v.findViewById(R.id.message_user);
+                messageTime = v.findViewById(R.id.message_time);
 
                 messageText.setText(model.getMessageText());
                 messageUser.setText(model.getMessageUser());
