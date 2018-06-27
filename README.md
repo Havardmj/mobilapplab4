@@ -44,4 +44,3 @@ The repo URL is correct. The project has a Readme file.
  When the app is gone from foreground, and new message is posted by another user, within the predefined timeframe, the background service will post a Notification that shows up on the user phone. The notification can be used to open the app (or bring it back to the foreground).
 
 
-Inspired by https://www.youtube.com/watch?v=Xn0tQHpMDnM
